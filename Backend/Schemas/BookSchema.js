@@ -13,6 +13,9 @@ const BookSchema = new Schema({
     authorname:{
         type:String
     },
+    bookdescription:{
+        type:String
+    },
     isbn:{
         type:String
     },

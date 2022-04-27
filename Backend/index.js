@@ -14,10 +14,11 @@ const User = require('./Schemas/UserSchema')
 const UserRouter  =require('./Routers/UserRouter')
 const AdminRouter = require('./Routers/AdminRouter')
 var bodyparser= require('body-parser')
+
 //___________App___________
 const app = express()
 app.use(cors())
-
+app.use(express.json())
 //___________ENV___________
 const mongoURI =process.env.MONGOURL ;
 const PORT = 8000
@@ -34,5 +35,29 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
     })
     .catch(err => console.log(err));
 
-app.use('/',UserRouter)
+
+app.post('/',(req,res)=>{
+    console.log('In Back')
+    console.log(req.body.email)
+    console.log(req.body.password)
+    var emailentered = {
+        "email": req.body.email
+    }
+    //  console.log(req.body.email)
+    User.findOne(emailentered).exec()
+    .then((result)=>{
+        if(result.password==req.body.password)
+            res.send(result)
+        else
+            res.send({success:false})
+    })
+    .catch((err)=>{
+        res.send({success:false})
+    })
+
+})
+    
+
+app.use('/user',UserRouter)
 app.use('/admin',AdminRouter)
+

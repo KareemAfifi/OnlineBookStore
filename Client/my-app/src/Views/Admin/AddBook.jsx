@@ -6,16 +6,25 @@ import { Button, Container, Typography } from '@mui/material';
 import { Grid } from '@material-ui/core';
   import { useState,useEffect } from 'react';
   import axios from 'axios'
+import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom' 
 const AddBook = () => {
+
   const [bookname,setbookname]=useState('')
   const [bookauthor,setbookauthor]=useState('')
   const [isbn,setisbn]=useState('')
   const [category,setcategory]=useState('')
   const [language,setlanguage] = useState('')
-
+  const [bookdescription, setbookdescription]=useState('')
   const [file, setSelectedFile] = useState('');
 	const [isFilePicked, setIsFilePicked] = useState(false)
 //CHANGING PARAMETERS
+
+const history = useHistory()
+
+const goBack = () => {
+  history.goBack()
+}
   const booknamechange=((e)=>{
     setbookname(e.target.value)
   });
@@ -35,6 +44,9 @@ const AddBook = () => {
   const languagechange=((e)=>{
     setlanguage(e.target.value)
   });
+  const bookdescriptionchange=((e)=>{
+    setbookdescription(e.target.value)
+  });
 
 
   const changeHandler = (event) => {
@@ -45,19 +57,25 @@ const AddBook = () => {
 
 	const handleSubmission =async (event) => {
     event.preventDefault()
-    var book= new FormData();
-   
-     book.append( "bookname",bookname)
-     book.append(   "authorname",bookauthor)
-     book.append(  "isbn",isbn)
-     book.append(  "category",category)
-     book.append(  "language",language)
-     book.append(  "bookimage",file)
-    
+     var book= {
+        "bookname":bookname,
+        "authorname":bookauthor,
+        "isbn":isbn,
+        "category":category,
+        "language":language,
+        "bookimage":file.name ,
+        "bookdescription":bookdescription
+     }
     console.log('Button Pressed')
-    console.log(file)
+    console.log(book)
+    console.log(file.name)
     
-    const res = await axios.post('http://localhost:8000/admin/addbook', book);
+    axios.post('http://localhost:8000/admin/addbook', book)
+      .then((res)=>{
+        console.log('Book Added Succesfully')
+        goBack()
+    })
+    .catch((err)=>{console.log('Book was not Added Successfully')})
 
   };
   //--------------------------------
@@ -123,6 +141,19 @@ const AddBook = () => {
               onChange={languagechange}
             />
             </Grid>
+            <Grid item xs={12}>
+            <TextField
+              required
+              id="bookdescription"
+              label="Book Description"
+              multiline
+              rows={4}
+              defaultValue=""
+              fullWidth
+              onChange={bookdescriptionchange}
+              
+            />
+            </Grid>
 
             <Grid item xs={12}>
              
@@ -141,7 +172,9 @@ const AddBook = () => {
             
             
             <Grid container direction='row'   justifyContent='flex-end'>
-            <Button variant='contained' onClick={handleSubmission}>Add Book</Button>
+              <Link to="/admin"  style={{ textDecoration: 'none'}}>
+                <Button variant='contained' onClick={handleSubmission}>Add Book</Button>
+              </Link>
             </Grid>
             
         </Grid>
